@@ -24,8 +24,8 @@ class YesButton(miru.Button):
     
     #* Si estoy subclaseando, debo llamar 'callback' a la repsuesta que da el boton cuando es presionado
     async def callback(self, ctx: miru.Context) -> None:
-        await ctx.respond(f"Recibido SI", flags= hikari.MessageFlag.EPHEMERAL)
-    
+        await ctx.respond("Recibido SI", flags= hikari.MessageFlag.EPHEMERAL)
+
         self.view.answer = True
         #* Paramos de escuchar interacciones
         self.view.stop()
@@ -39,7 +39,7 @@ class NoButton(miru.Button):
 
     async def callback(self, ctx: miru.Context) -> None:
         
-        await ctx.respond(f"Recibido NO", flags= hikari.MessageFlag.EPHEMERAL)
+        await ctx.respond("Recibido NO", flags= hikari.MessageFlag.EPHEMERAL)
         self.view.answer = False
         self.view.stop()
 
@@ -51,7 +51,7 @@ class LinkButton(miru.Button):
         super().__init__(style= hikari.ButtonStyle.LINK, url= link, label= label, emoji= emoji, row= row)
     
     async def callback(self, ctx: miru.Context) -> None:
-        await ctx.respond(f"Esto es una prueba")
+        await ctx.respond("Esto es una prueba")
         self.view.answer = False
 
 
@@ -77,8 +77,10 @@ class MyModal(miru.Modal):
     # The callback function is called after the user hits 'Submit'
     async def callback(self, ctx: miru.ModalContext) -> None:
         # ModalContext.values is a mapping of {TextInput: value}
-        values = [value for value in ctx.values.values()]
-        await ctx.respond(f"He enviado tus penurias a el infierno para que se hagan realidad")
+        values = list(ctx.values.values())
+        await ctx.respond(
+            "He enviado tus penurias a el infierno para que se hagan realidad"
+        )
     # You may also access the values the modal holds by using Modal.values
 
 

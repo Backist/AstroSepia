@@ -94,7 +94,7 @@ async def _join(ctx: lightbulb.Context) -> Optional[hikari.Snowflake]:
 async def is_running(guild_id: lightbulb.Context) -> bool:
 	node = await music.bot.d.lavalink.get_guild_node(guild_id)
 	connect = music.bot.d.lavalink.get_guild_gateway_connection_info(guild_id)
-	return False if node or connect is None else True 
+	return not node and connect is not None 
 
 
 
@@ -127,9 +127,9 @@ async def join(ctx: lightbulb.Context) -> None:
 
 	if channel_id:
 		embed = hikari.Embed(
-			title= f"✅ AstroSepia se ha unido a un canal de voz",
-			description= f"**Unido al canal** <#{channel_id}>",
-			color= SUCCESS_EMBED
+			title="✅ AstroSepia se ha unido a un canal de voz",
+			description=f"**Unido al canal** <#{channel_id}>",
+			color=SUCCESS_EMBED,
 		)
 		await ctx.respond(embed)
 
@@ -148,8 +148,6 @@ async def leave(ctx: lightbulb.Context) -> None:
 			title= "AstroSepia no esta en ningun canal",
 			color= ALERT_EMBED
 		)
-		await ctx.respond(embed)
-
 	else:
 		await music.bot.d.lavalink.destroy(ctx.guild_id)
 
@@ -165,15 +163,15 @@ async def leave(ctx: lightbulb.Context) -> None:
 		await music.bot.d.lavalink.remove_guild_from_loops(ctx.guild_id)
 
 		embed = hikari.Embed(
-			title= f"✅ AstroSepia ha salido del canal",
-			color= SUCCESS_EMBED
+			title="✅ AstroSepia ha salido del canal", color=SUCCESS_EMBED
 		)
-		await ctx.respond(embed)
+
+	await ctx.respond(embed)
 
 
 @music.command()
 @lightbulb.add_checks(lightbulb.guild_only)
-@lightbulb.option("query", "La consulta a buscar", modifier=lightbulb.OptionModifier.CONSUME_REST)	
+@lightbulb.option("query", "La consulta a buscar", modifier=lightbulb.OptionModifier.CONSUME_REST)
 @lightbulb.command("play", "Busca la consulta en Youtube o añade la URL a la cola", aliases = ["repr"])
 @lightbulb.implements(lightbulb.PrefixCommand, lightbulb.SlashCommand)
 async def play(ctx: lightbulb.Context) -> None:
@@ -181,9 +179,9 @@ async def play(ctx: lightbulb.Context) -> None:
 
 	if not ctx.options.query:
 		embed = hikari.Embed(
-			title= f"Se te olvida algo . . .",
-			description= f"Pasa una URL o pasa una consulta",
-			color= ALERT_EMBED
+			title="Se te olvida algo . . .",
+			description="Pasa una URL o pasa una consulta",
+			color=ALERT_EMBED,
 		)
 		await ctx.respond(embed)
 		return None
@@ -200,8 +198,8 @@ async def play(ctx: lightbulb.Context) -> None:
 
 	if not query_information.tracks:  # tracks is empty
 		embed = hikari.Embed(
-			title= f":dash: No he podido encontrar ningun resultado",
-			color= ATTENTION_EMBED
+			title=":dash: No he podido encontrar ningun resultado",
+			color=ATTENTION_EMBED,
 		)
 		await ctx.respond(embed)
 		return 
@@ -213,8 +211,8 @@ async def play(ctx: lightbulb.Context) -> None:
 
 	except lavasnek_rs.NoSessionPresent as error:
 		embed = hikari.Embed(
-			title= f"Usa `/join |<<join` Primero para que AstroSepia se una al canal de voz",
-			color= ATTENTION_EMBED
+			title="Usa `/join |<<join` Primero para que AstroSepia se una al canal de voz",
+			color=ATTENTION_EMBED,
 		)
 		await ctx.respond(embed)
 		raise error
@@ -224,19 +222,18 @@ async def play(ctx: lightbulb.Context) -> None:
 		if node.now_playing:
 
 			embed = hikari.Embed(
-				title= f"✅ Reproduciendo la pista",
-				description= f"Se esta reproduciendo ``{query_information.tracks[0].info.title}``",
-				color= SUCCESS_EMBED
+				title="✅ Reproduciendo la pista",
+				description=f"Se esta reproduciendo ``{query_information.tracks[0].info.title}``",
+				color=SUCCESS_EMBED,
 			)
-			await ctx.respond(embed)
-
 		else:
 			embed = hikari.Embed(
-				title= f"✅ Pista añadida a la cola",
-				description= f"Añadida ``{query_information.tracks[0].info.title}`` a la lista",
-				color= SUCCESS_EMBED
+				title="✅ Pista añadida a la cola",
+				description=f"Añadida ``{query_information.tracks[0].info.title}`` a la lista",
+				color=SUCCESS_EMBED,
 			)
-			await ctx.respond(embed)
+
+		await ctx.respond(embed)
 		
         
 @music.command()
@@ -249,19 +246,17 @@ async def stop(ctx: lightbulb.Context) -> None:
 
 	# Take sure that session is running, if not session running, return not in channel (bc any session is started)
 	node = await music.bot.d.lavalink.get_guild_node(ctx.guild_id)
-	
+
 	if not node:
 		embed= hikari.Embed(
 			title= "AstroSepia no esta en ningun canal",
 			color= ALERT_EMBED
 		)
-		await ctx.respond(embed)
-
 	else:
 
 		await music.bot.d.lavalink.stop(ctx.guild_id)
 		node.queue = []
-	
+
 		if not stop:
 			embed = hikari.Embed(
 				title= ":dash: No hay ninguna pista para saltar",
@@ -269,10 +264,11 @@ async def stop(ctx: lightbulb.Context) -> None:
 			)
 
 		embed = hikari.Embed(
-			title= f"✅ La pista se ha parado correctamente y se ha eliminado la queue",
-			color= SUCCESS_EMBED
+			title="✅ La pista se ha parado correctamente y se ha eliminado la queue",
+			color=SUCCESS_EMBED,
 		)
-		await ctx.respond(embed)
+
+	await ctx.respond(embed)
 
 
 @music.command()
@@ -287,12 +283,9 @@ async def stop(ctx: lightbulb.Context) -> None:
 	if node is not None:
 
 		await music.bot.d.lavalink.resume(ctx.guild_id)
-		embed = hikari.Embed(
-			title= f"✅ Pista sonando!",
-			color= SUCCESS_EMBED
-		)
+		embed = hikari.Embed(title="✅ Pista sonando!", color= SUCCESS_EMBED)
 		await ctx.respond(embed)
-	
+
 
 	embed = hikari.Embed(
 		title= ":dash: No esta sonando ninguna pista ahora"
@@ -308,32 +301,28 @@ async def skip(ctx: lightbulb.Context) -> None:
 
 	skip = await music.bot.d.lavalink.skip(ctx.guild_id)
 	node = await music.bot.d.lavalink.get_guild_node(ctx.guild_id)
-	
+
 	# Nothing to skip
 	if not skip:
 		embed = hikari.Embed(
-			title= f"Ops . . .",
-			description= "No hay ninguna pista activa en este momento :dash:",
-			color= ATTENTION_EMBED
+			title="Ops . . .",
+			description="No hay ninguna pista activa en este momento :dash:",
+			color=ATTENTION_EMBED,
 		)
-		await ctx.respond(embed)
+	elif node.queue or node.now_playing:
+		embed = hikari.Embed(
+			title="✅ Se ha pasado a la siguiente pista de la cola",
+			description=f"Pista saltada: {skip.track.info.title}",
+			color=SUCCESS_EMBED,
+		)
+
 	else:
-		# If the queue is empty, the next track won't start playing (because there isn't any),
-		# so we stop the player.
-		if not node.queue and not node.now_playing:
-			await music.bot.d.lavalink.stop(ctx.guild_id)
-			embed = hikari.Embed(
-				title= ":dash: No hay ninguna pista en la cola para saltar",
-				color= ALERT_EMBED
-			)
-			await ctx.respond(embed)
-		else:
-			embed = hikari.Embed(
-				title= f"✅ Se ha pasado a la siguiente pista de la cola",
-				description= f"Pista saltada: {skip.track.info.title}",
-				color= SUCCESS_EMBED
-			)
-			await ctx.respond(embed)
+		await music.bot.d.lavalink.stop(ctx.guild_id)
+		embed = hikari.Embed(
+			title= ":dash: No hay ninguna pista en la cola para saltar",
+			color= ALERT_EMBED
+		)
+	await ctx.respond(embed)
 
 
 @music.command()
@@ -351,10 +340,7 @@ async def pause(ctx: lightbulb.Context) -> None:
 			title= ":dash: No se esta reproduciendo musica en este momento o los servidores estan apagados."
 		)
 
-	embed = hikari.Embed(
-		title= f"✅ Pista pausada",
-		color= SUCCESS_EMBED
-	)
+	embed = hikari.Embed(title="✅ Pista pausada", color= SUCCESS_EMBED)
 	await ctx.respond(embed)
 
 
@@ -369,8 +355,8 @@ async def now_playing(ctx: lightbulb.Context) -> None:
 
 	if not node or not node.now_playing:
 		embed = hikari.Embed(
-			title= f":dash: No se esta reproduciendo ninguna pista en este momento",
-			color= ATTENTION_EMBED
+			title=":dash: No se esta reproduciendo ninguna pista en este momento",
+			color=ATTENTION_EMBED,
 		)
 		await ctx.respond(embed)
 		return

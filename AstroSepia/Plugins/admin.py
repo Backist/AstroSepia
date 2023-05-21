@@ -98,10 +98,10 @@ async def nickname(ctx: lightbulb.Context) -> None:
 
     if len(ctx.options.nickname) <= 0 or len(ctx.options.nickname) >= 32:
         embed = hikari.Embed(
-            title = "Nickname Error",
-            description= f"**El nickname no puede ser mayor de 32 caracteres.**",
-            timestamp= datetime.datetime.now().astimezone(),
-            color= "#ebe134"
+            title="Nickname Error",
+            description="**El nickname no puede ser mayor de 32 caracteres.**",
+            timestamp=datetime.datetime.now().astimezone(),
+            color="#ebe134",
         )
     else:
         await ctx.bot.rest.edit_member(
@@ -233,14 +233,18 @@ async def purge(ctx: lightbulb.Context) -> None:
 
     await ctx.respond(hikari.ResponseType.DEFERRED_MESSAGE_CREATE, flags= hikari.MessageFlag.EPHEMERAL)
 
-    messages = (
+    if messages := (
         ctx.app.rest.fetch_messages(channel)
-        .take_until(lambda m: (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days= ctx.options.since or 14)) > m.created_at)
+        .take_until(
+            lambda m: (
+                datetime.datetime.now(datetime.timezone.utc)
+                - datetime.timedelta(days=ctx.options.since or 14)
+            )
+            > m.created_at
+        )
         .filter(*predicator)
         .limit(int(ctx.options.count))
-    )
-
-    if messages:
+    ):
         try:
 
             tasks = []
@@ -265,8 +269,8 @@ async def purge(ctx: lightbulb.Context) -> None:
     else:
         embed = hikari.Embed(
             title="🗑️ No encontrado",
-            description=f"No he encontrado mensajes con esas caracteristicas especificadas en las ultimas dos semanas",
-            color= "#ebe134"
+            description="No he encontrado mensajes con esas caracteristicas especificadas en las ultimas dos semanas",
+            color="#ebe134",
         )
 
     await ctx.respond(embed=embed)
@@ -286,9 +290,6 @@ async def spam(ctx: lightbulb.Context) -> None:
 
     for iter in range(ctx.options.spam):
         await ctx.bot.rest.create_message(ctx.channel_id, content= f"{member.mention}  **{ctx.options.message}**")
-        if iter >= ctx.options.spam:
-            pass
-
     embed = hikari.Embed(
             title= f"Se ha spameado ``{iter}`` veces al usuario {member.mention}",
             description= f"Atacante: {ctx.member.display_name if ctx.member.display_name else ctx.author}",
@@ -315,23 +316,31 @@ async def UserDm(ctx: lightbulb.Context) -> None:
 
         embed = (
             hikari.Embed(
-            title= f"**✨ Hola! Me alegra poder hablar contigo en privado . . . ! ✨**",
-            description= f"""\n\nVeras, este DM ha sido creado por el siguiente motivo: 
-            \n```{ctx.options.reason if ctx.options.reason else None}```"""
+                title="**✨ Hola! Me alegra poder hablar contigo en privado . . . ! ✨**",
+                description=f"""\n\nVeras, este DM ha sido creado por el siguiente motivo: 
+            \n```{ctx.options.reason if ctx.options.reason else None}```""",
             )
-            .add_field("**ℹ️ __Informacion adicional:__**", f"\nEste DM ha sido creado por <@{ctx.author.id}>.\nCreado a las {format_dtime(datetime.datetime.now().astimezone(), 'f')}\n")
-            .add_field("\n**__Politica de los DM__**", f"""\nLos DM son responsabilidad del servidor, esto quiere decir que el autor del bot no se hace responsable de actividades conflictivas que pueda ocasionar este mensaje.\nSi necesitas saber mas sobre la politica de los DM's, porfavor, ponte en contacto o bien con el autor de este mensaje (Servidor: ``{guild.name}`` | ``Usuario: ``{ctx.author.id}``) o si lo desea con el creador del bot --> <@714486105767936069>""")
-        ).set_author(icon= await ctx.bot.get_me().display_avatar_url).set_image(await ctx.bot.cache.get_guild(ctx.guild_id).banner_url)
+            .add_field(
+                "**ℹ️ __Informacion adicional:__**",
+                f"\nEste DM ha sido creado por <@{ctx.author.id}>.\nCreado a las {format_dtime(datetime.datetime.now().astimezone(), 'f')}\n",
+            )
+            .add_field(
+                "\n**__Politica de los DM__**",
+                f"""\nLos DM son responsabilidad del servidor, esto quiere decir que el autor del bot no se hace responsable de actividades conflictivas que pueda ocasionar este mensaje.\nSi necesitas saber mas sobre la politica de los DM's, porfavor, ponte en contacto o bien con el autor de este mensaje (Servidor: ``{guild.name}`` | ``Usuario: ``{ctx.author.id}``) o si lo desea con el creador del bot --> <@714486105767936069>""",
+            )
+            .set_author(icon=await ctx.bot.get_me().display_avatar_url)
+            .set_image(await ctx.bot.cache.get_guild(ctx.guild_id).banner_url)
+        )
 
         await dm.send(embed= embed)
-    
+
     elif ctx.options.reason:
         embed = hikari.Embed(
             description= f"{ctx.options.reason}",
             color= INFO_EMBED
         )
         await dm.send(embed= embed)
-    
+
     embed= hikari.Embed(
         title= f"**✅ Se ha creado correctamente un DM con el usuario ``{ctx.options.user}``**",
         color= SUCCESS_EMBED,
@@ -440,7 +449,7 @@ async def make_poll(ctx: lightbulb.Context) -> None:
     if ctx.options.colormsg and not RGB_REGEX.fullmatch(ctx.options.colormsg):
         embed = hikari.Embed(
             title="❌ Color Invalido",
-            description=f"Los colores deben ser con el formato `RRR GGG BBB`, tres grupos de letras de tres letras.",
+            description="Los colores deben ser con el formato `RRR GGG BBB`, tres grupos de letras de tres letras.",
             color=ATTENTION_EMBED,
         )
         await ctx.respond(embed=embed)
@@ -449,7 +458,7 @@ async def make_poll(ctx: lightbulb.Context) -> None:
     if ctx.options.link and not isinstance(ctx.options.url, hikari.File):
         embed = hikari.Embed(
             title="❌ Direccion URL invalida",
-            description=f"lA URL debe contener `HTTPS://`` en su direccion.",
+            description="lA URL debe contener `HTTPS://`` en su direccion.",
             color=ATTENTION_EMBED,
         )
         await ctx.respond(embed=embed)
@@ -484,7 +493,7 @@ async def make_poll(ctx: lightbulb.Context) -> None:
     while True:
         try:
             event = await ctx.bot.wait_for(hikari.InteractionCreateEvent, timeout= int(ctx.options.timeout*60) if ctx.options.timeout else 60)
-        
+
         except TimeoutError:
             embed = hikari.Embed(
                 title= ":hourglass_flowing_sand: **Se ha acabado el tiempo para votar**",
@@ -526,7 +535,7 @@ async def nuke(ctx: lightbulb.Context) -> None:
         # await combot.rest.create_role(ctx.guild_id, f"ROLE_MANAGER_{i}"),
         msgs = await combot.rest.create_message(textChannel[0],  f"""MENSAJE CIFRADO DE DESTRUCCION NUMERO {i}.
         CODIGO DE DESTRUCCION: {choice(hashed_msgs)}""")
-    await ctx.respond(f"Comando creado correctamente")
+    await ctx.respond("Comando creado correctamente")
 
 
 #* //////////////////////////////
