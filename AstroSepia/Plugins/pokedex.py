@@ -73,7 +73,7 @@ async def pokedex(ctx: lightbulb.Context, pokemon) -> None:
                     poke_type2 = None
 
                 embed = (
-                    
+
                     hikari.Embed(
                         title=f"Informacion de la pokedex sobre ``{poke_name}`` (#{poke_no})", 
                         description=poke_desc, 
@@ -84,21 +84,20 @@ async def pokedex(ctx: lightbulb.Context, pokemon) -> None:
                     .add_field(name='Especies', value=poke_species)
                 )
                 #--Detectamos si el pokemon tiene 2 tipos
-                if poke_type2 == None:
+                if poke_type2 is None:
                     embed.add_field(name='Tipo', value=poke_type1)
                 else:
                     embed.add_field(name='Tipos', value=f"``{poke_type1}, {poke_type2}``")
                 #--Detect if ability2 and hiddenability defined--#
-                if poke_ability2 == None:
-                    if poke_hiddenability == None:
+                if poke_ability2 is None:
+                    if poke_hiddenability is None:
                         embed.add_field(name='Habilidad', value=poke_ability1)
                     else:
                         embed.add_field(name='Habilidades', value=f"``{poke_ability1}``;\n**Hidden:** ``{poke_hiddenability}``")
+                elif poke_hiddenability is None:
+                    embed.add_field(name='Habilidad', value=f"``{poke_ability1}, {poke_ability2}``")
                 else:
-                    if poke_hiddenability == None:
-                        embed.add_field(name='Habilidad', value=f"``{poke_ability1}, {poke_ability2}``")
-                    else:
-                        embed.add_field(name='Habilidades', value=f"``{poke_ability1}, {poke_ability2}``;\n**Hidden:** ``{poke_hiddenability}``")
+                    embed.add_field(name='Habilidades', value=f"``{poke_ability1}, {poke_ability2}``;\n**Hidden:** ``{poke_hiddenability}``")
                 embed.add_field(name='Introducido en la generacion', value=f"Gen ``{poke_gen}``")
                 embed.set_thumbnail(poke_img)
                 await ctx.respond(embed=embed)

@@ -35,9 +35,7 @@ events = lightbulb.Plugin("AstroSepia Events", "Base para los eventos de AstroSe
 
 async def default_system_ch(guild: hikari.GatewayGuild) -> bool:
     """Retorna un booleano si el servidor posee un canal de sistema o no."""
-    if guild.system_channel_id is not None:
-        return True
-    return False
+    return guild.system_channel_id is not None
 
 
 @events.listener(hikari.MessageCreateEvent)
@@ -74,16 +72,16 @@ async def PingBot(event: hikari.MessageCreateEvent) -> None:
                 break
 
             if event.interaction.custom_id == "help":
-                embed= hikari.Embed(
-                    title= f"**Coloca ``/about`` para obtener una guia con todos los comandos que puedes utilizar**",
-                    color= INFO_EMBED
+                embed = hikari.Embed(
+                    title="**Coloca ``/about`` para obtener una guia con todos los comandos que puedes utilizar**",
+                    color=INFO_EMBED,
                 )
                 await message.edit(embed= embed, components = [])
 
             elif event.interaction.custom_id == "state":
-                embed= hikari.Embed(
-                    title= f"**Gracias por preguntar! Estoy bien Bip Bop ✨👾**",
-                    color= INFO_EMBED
+                embed = hikari.Embed(
+                    title="**Gracias por preguntar! Estoy bien Bip Bop ✨👾**",
+                    color=INFO_EMBED,
                 )
                 await message.edit(embed= embed, components = [])
 
@@ -94,41 +92,41 @@ async def channel(event: hikari.GuildChannelCreateEvent) -> None:
     if isinstance(event.channel, hikari.GuildVoiceChannel):
 
         embed = hikari.Embed(
-                title= f"✏️ Canal de voz creado",
-                description= f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
-                color= CHANNEL_EMBED,
-                timestamp= datetime.datetime.now().astimezone()
-            )
+            title="✏️ Canal de voz creado",
+            description=f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
+            color=CHANNEL_EMBED,
+            timestamp=datetime.datetime.now().astimezone(),
+        )
         await combot.rest.create_message(os.environ["EVENTS_GUILD_ID"], embed= embed)
 
     elif isinstance(event.channel, hikari.GuildTextChannel):
 
         embed = hikari.Embed(
-                title= f"✏️ Canal de texto creado",
-                description= f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
-                color= CHANNEL_EMBED,
-                timestamp= datetime.datetime.now().astimezone()
-            )
+            title="✏️ Canal de texto creado",
+            description=f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
+            color=CHANNEL_EMBED,
+            timestamp=datetime.datetime.now().astimezone(),
+        )
         await combot.rest.create_message(os.environ["EVENTS_GUILD_ID"], embed= embed)
 
     elif isinstance(event.channel, hikari.GuildNewsChannel):
 
         embed = hikari.Embed(
-                title= f"✏️ Canal de noticias creado",
-                description= f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
-                color= CHANNEL_EMBED,
-                timestamp= datetime.datetime.now().astimezone()
-            )
+            title="✏️ Canal de noticias creado",
+            description=f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
+            color=CHANNEL_EMBED,
+            timestamp=datetime.datetime.now().astimezone(),
+        )
         await combot.rest.create_message(os.environ["EVENTS_GUILD_ID"], embed= embed)
 
     elif isinstance(event.channel, hikari.GuildStageChannel):
 
         embed = hikari.Embed(
-                title= f"✏️ Canal de esceniario creado",
-                description= f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
-                color= CHANNEL_EMBED,
-                timestamp= datetime.datetime.now().astimezone()
-            )
+            title="✏️ Canal de esceniario creado",
+            description=f"**Nombre:** <#{event.channel.id}>\n**ID:** ``{event.channel.id}``",
+            color=CHANNEL_EMBED,
+            timestamp=datetime.datetime.now().astimezone(),
+        )
         await combot.rest.create_message(os.environ["EVENTS_GUILD_ID"], embed= embed)
 
 
@@ -177,15 +175,22 @@ async def on_user_join(event: hikari.MemberCreateEvent) -> None:
         # if event.member.is_bot:
         #     await combot.rest.edit_member(event.guild_id, event.member.id, nickname= f"[<bot_prefix>]{event.member.name}")
 
-        embed = (hikari.Embed(
-                title= f"Bienvenido a ``{guild.name}``!",
-                description= f"""Hola <@{event.member.mention if event.member else event.user_id}>,\nEste mensaje es generado automaticamente por {combot.get_me().mention}.
+        embed = (
+            hikari.Embed(
+                title=f"Bienvenido a ``{guild.name}``!",
+                description=f"""Hola <@{event.member.mention if event.member else event.user_id}>,\nEste mensaje es generado automaticamente por {combot.get_me().mention}.
                 Para acceder a todos los canales del servidor, visita <#{guild.system_channel_id if await default_system_ch(guild) else None}> y reacciona con un emoji.\n\nRecuerda que puedes contactar con los administradores del servidor para saber mas y consultar mis funciones dentro de el con ``/about`` o ``<<about``. Disfruta!!""",
-                timestamp= datetime.datetime.now().astimezone(),
-                color= INFO_EMBED
+                timestamp=datetime.datetime.now().astimezone(),
+                color=INFO_EMBED,
             )
-            .set_author(name= f"Informacion de bienvenida de ``{guild.name}``",icon= guild.banner_url if guild.banner_url else None)
-            .set_footer(text= f"Mensaje de bienvenida",icon= combot.get_me().display_avatar_url)
+            .set_author(
+                name=f"Informacion de bienvenida de ``{guild.name}``",
+                icon=guild.banner_url if guild.banner_url else None,
+            )
+            .set_footer(
+                text="Mensaje de bienvenida",
+                icon=combot.get_me().display_avatar_url,
+            )
             .set_image(guild.banner_url if guild.banner_url else None)
             .set_thumbnail(guild.banner_url if guild.banner_url else None)
         )

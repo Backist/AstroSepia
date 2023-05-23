@@ -36,21 +36,18 @@ async def privilege_usage(user: hikari.Member, guild: hikari.GatewayGuild) -> bo
     ur = [role.id for role in u.get_roles()]
     for roles in ur:
         infrol = combot.cache.get_role(roles)
-        if hikari.Permissions.ADMINISTRATOR or hikari.Permissions.MANAGE_GUILD in infrol.permissions:
-            return True 
-        return False
+        return bool(
+            hikari.Permissions.ADMINISTRATOR
+            or hikari.Permissions.MANAGE_GUILD in infrol.permissions
+        )
 
 @setts.command
 @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.ADMINISTRATOR, hikari.Permissions.MANAGE_GUILD))
 @lightbulb.add_cooldown(600, 2, lightbulb.GuildBucket)
 @lightbulb.command("settings", "Menu para modificar los ajustes del bot", aliases = ["internals"])
 @lightbulb.implements(lightbulb.SlashCommandGroup, lightbulb.PrefixCommandGroup)
-#async def settings(ctx : lightbulb.Context) -> None:
-
-
-
 @setts.command
-@lightbulb.option("extension", "Reiniciar una extension en especifico", choices= [exts for exts in combot.extensions])
+@lightbulb.option("extension", "Reiniciar una extension en especifico", choices=list(combot.extensions))
 @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.ADMINISTRATOR, hikari.Permissions.MANAGE_GUILD))
 @lightbulb.add_cooldown(3600, 1, lightbulb.GuildBucket)
 @lightbulb.command("refresh", "Reinicia las extensiones y vuelve a iniciarlas.", aliases= ["reloadext"], ephemeral= True)
@@ -70,7 +67,7 @@ async def reload_ext(ctx: lightbulb.Context) -> None:
     await ctx.respond(embed)
 
 @setts.command
-@lightbulb.option("extension", "Remover una extension en especifico", choices= [exts for exts in combot.extensions])
+@lightbulb.option("extension", "Remover una extension en especifico", choices=list(combot.extensions))
 @lightbulb.add_checks(lightbulb.has_guild_permissions(hikari.Permissions.ADMINISTRATOR, hikari.Permissions.MANAGE_GUILD))
 @lightbulb.add_cooldown(3600, 1, lightbulb.GuildBucket)
 @lightbulb.command("removext", "Reinicia las extensiones y vuelve a iniciarlas.", aliases= ["unloadext"], ephemeral= True)

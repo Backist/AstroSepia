@@ -53,8 +53,8 @@ async def about(ctx: lightbulb.Context) -> None:
 @lightbulb.implements(lightbulb.SlashCommand, lightbulb.PrefixCommand)
 async def invitation(ctx: lightbulb.Context) -> None:
 
-    invitation_link = f"https://discord.com/api/oauth2/authorize?client_id=956651574422282290&permissions=1541355859063&scope=bot%20applications.commands"
-    
+    invitation_link = "https://discord.com/api/oauth2/authorize?client_id=956651574422282290&permissions=1541355859063&scope=bot%20applications.commands"
+
     embed = hikari.Embed(
         description= f"Haz click **[aqui]({invitation_link})** para invitarme!\n\n📩 **[Invitar]({invitation_link})**",
         color= INFO_EMBED
@@ -84,10 +84,10 @@ async def invitation(ctx: lightbulb.Context) -> None:
 async def invitation(ctx: lightbulb.Context) -> None:
 
     embed = hikari.Embed(
-        title= f"**🔋 AstroSepia's Status**",
-        description= f"**Version de AstroSepia: ``{__version__}``**\n**Current Mode: ``{current_mode}``**\n**Owners: ``{combot.owner_ids}``**",
-        color= INFO_EMBED,
-        timestamp= datetime.datetime.now().astimezone()
+        title="**🔋 AstroSepia's Status**",
+        description=f"**Version de AstroSepia: ``{__version__}``**\n**Current Mode: ``{current_mode}``**\n**Owners: ``{combot.owner_ids}``**",
+        color=INFO_EMBED,
+        timestamp=datetime.datetime.now().astimezone(),
     )
     await ctx.respond(embed)
 
@@ -101,10 +101,10 @@ async def reader(ctx: lightbulb.Context) -> None:
 
     file = await ctx.options.filedoc.read()
     embed = hikari.Embed(
-        title= f"**File Reader**",
-        description= f"**Nombre de archivo:** {ctx.options.filedoc.filename}\n**Lineas escritas:{ctx.options.filedoc.extension}** \n**Lineas en blanco:** {ctx.options.filedoc.media_type}\n{len([i for i in file])}",
-        color= INFO_EMBED,
-        timestamp= datetime.datetime.now().astimezone()
+        title="**File Reader**",
+        description=f"**Nombre de archivo:** {ctx.options.filedoc.filename}\n**Lineas escritas:{ctx.options.filedoc.extension}** \n**Lineas en blanco:** {ctx.options.filedoc.media_type}\n{len(list(file))}",
+        color=INFO_EMBED,
+        timestamp=datetime.datetime.now().astimezone(),
     )
     await ctx.respond(embed)
 
@@ -282,8 +282,7 @@ async def get_server_info(ctx: lightbulb.Context) -> None:
     online = [m for m in presences.values() if m.visible_status == "online"]
     idle = [m for m in presences.values() if m.visible_status == "idle"]
     dnd = [m for m in presences.values() if m.visible_status == "dnd"]
-    ls = []
-    ls.extend(online)
+    ls = list(online)
     ls.extend(idle)
     ls.extend(dnd)
     offline_invisible = len(guild.get_members()) - len(ls)
@@ -302,9 +301,7 @@ async def get_server_info(ctx: lightbulb.Context) -> None:
 
     hidden_voice = 0
     hidden_text = 0
-    all_channels = 0
-
-    for channel in channels:
+    for all_channels, channel in enumerate(channels):
         perms_value = everyone_perms
         if everyone in channel.permission_overwrites:
             overwrites = channel.permission_overwrites[everyone]
@@ -312,17 +309,11 @@ async def get_server_info(ctx: lightbulb.Context) -> None:
             perms_value &= -deny.value
             perms_value |= allow.value
         perms = str(hikari.Permissions(perms_value)).split(" | ")
-        all_channels += 1
-        if (
-            isinstance(channel, hikari.GuildVoiceChannel)
-            and "VIEW_CHANNEL" not in perms
-        ):
-            hidden_text += 1
-        elif (
-            isinstance(channel, hikari.GuildVoiceChannel)
-            and not perms_value & hikari.Permissions.CONNECT
-        ):
-            hidden_voice += 1
+        if isinstance(channel, hikari.GuildVoiceChannel):
+            if "VIEW_CHANNEL" not in perms:
+                hidden_text += 1
+            elif not perms_value & hikari.Permissions.CONNECT:
+                hidden_voice += 1
 
     embed = (
 
@@ -350,14 +341,14 @@ Nitro: {'✅' if guild.premium_tier or guild.premium_subscription_count >= 1 els
         value=  f"""**• Texto:** {len([tch for tch in channels if isinstance(tch, hikari.TextableGuildChannel)])}
         **• Voz:** {len([tch for tch in channels if isinstance(tch, hikari.GuildVoiceChannel)])}
         **• News:** {len([tch for tch in channels if isinstance(tch, hikari.GuildNewsChannel)])}\n**• Canales ocultos:** {hidden_text+hidden_voice}""")
-        
+
         .add_field(name="• Rule Channel", value=f"<#{guild.rules_channel_id}>", inline= True)
         .add_field(name="• AFK Channel", value=f"<#{guild.afk_channel_id}> ({guild.afk_timeout} horas)", inline= True)
-        
+
         .set_thumbnail(guild.icon_url)
 
     )
-    
+
     await ctx.respond(embed=embed, flags= hikari.MessageFlag.EPHEMERAL)
 
 
@@ -371,19 +362,42 @@ async def bot_proccess(ctx: lightbulb.Context):
     t_memory = psutil.virtual_memory()
     freq = psutil.cpu_freq(percpu=False)
 
-    embed= (
-        hikari.Embed(
-            title="🤖  AstroSepia Processes"
+    embed = (
+        hikari.Embed(title="🤖  AstroSepia Processes")
+        .add_field(
+            "📉 CPU",
+            f"`{round(psutil.cpu_percent(interval=None))} %`",
+            inline=True,
         )
-        .add_field("📉 CPU", f"`{round(psutil.cpu_percent(interval=None))} %`", inline= True)
-        .add_field("🚀 Memory", f"`{round(process.memory_info().vms / 1048576)} MB`", inline= True)
-        .add_field("💻 Total Memory", f"``{round(t_memory.total / 1048576)} MB``", inline= True)  #1B == 1048576 MB
-        .add_field("🟢 Servers", f"``{len(combot.shards.keys())}``", inline= True)
-        .add_field("🔧 Threading", f"``{psutil.cpu_count(logical=True)} Cores``", inline= True)
-        .add_field("📊 CPU Freq", f"``{round(freq.current)} Mhz``", inline= True)
-        .add_field(f"Comandos activos:", f"```Slash: {len([f for f in combot.slash_commands.values()])}    |     Prefix: {len([f.name for f in combot.prefix_commands.values()])}```")
-        .add_field(f"Permisos:", f"```{combot.intents}```", inline= True)
-        .add_field("Plugins", f"```{len([f.name for f in combot.plugins.values()])}```", inline= True)
+        .add_field(
+            "🚀 Memory",
+            f"`{round(process.memory_info().vms / 1048576)} MB`",
+            inline=True,
+        )
+        .add_field(
+            "💻 Total Memory",
+            f"``{round(t_memory.total / 1048576)} MB``",
+            inline=True,
+        )  # 1B == 1048576 MB
+        .add_field(
+            "🟢 Servers", f"``{len(combot.shards.keys())}``", inline=True
+        )
+        .add_field(
+            "🔧 Threading",
+            f"``{psutil.cpu_count(logical=True)} Cores``",
+            inline=True,
+        )
+        .add_field("📊 CPU Freq", f"``{round(freq.current)} Mhz``", inline=True)
+        .add_field(
+            "Comandos activos:",
+            f"```Slash: {len(list(combot.slash_commands.values()))}    |     Prefix: {len([f.name for f in combot.prefix_commands.values()])}```",
+        )
+        .add_field("Permisos:", f"```{combot.intents}```", inline=True)
+        .add_field(
+            "Plugins",
+            f"```{len([f.name for f in combot.plugins.values()])}```",
+            inline=True,
+        )
         .set_footer("El bot realiza procesos de una sola dirección.")
     )
     await ctx.respond(embed= embed)
@@ -432,7 +446,7 @@ async def embed(ctx: lightbulb.Context) -> None:
         if option and not type(hikari.File.url):
             embed = hikari.Embed(
                 title="❌ Invalid URL",
-                description=f"Proporciona una URL válida",
+                description="Proporciona una URL válida",
                 color=ctx.options.colors,
             )
             await ctx.respond(embed=embed, flags=hikari.MessageFlag.EPHEMERAL)
@@ -441,7 +455,7 @@ async def embed(ctx: lightbulb.Context) -> None:
     if ctx.options.color is not None and not RGB_REGEX.fullmatch(ctx.options.color):
         embed = hikari.Embed(
             title="❌ Color Invalido",
-            description=f"Los colores deben ser con el formato `RRR GGG BBB`, tres grupos de letras de tres letras.",
+            description="Los colores deben ser con el formato `RRR GGG BBB`, tres grupos de letras de tres letras.",
             color=ctx.options.color,
         )
         await ctx.respond(embed=embed, flags=hikari.MessageFlag.EPHEMERAL)
@@ -463,8 +477,10 @@ async def embed(ctx: lightbulb.Context) -> None:
         )
     )
     await ctx.app.rest.create_message(ctx.channel_id, embed=embed)
-    if len(file_images) > 0:
-        await ctx.app.rest.create_message(ctx.channel_id, attachments= [file for file in file_images])
+    if file_images:
+        await ctx.app.rest.create_message(
+            ctx.channel_id, attachments=list(file_images)
+        )
     embed = hikari.Embed(title="✅ Embebido creado!")
     await ctx.respond(embed=embed, flags=hikari.MessageFlag.EPHEMERAL)
 

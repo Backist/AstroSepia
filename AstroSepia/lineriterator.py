@@ -35,8 +35,6 @@ for filen in all_files:
             file = Path(f"C:\\Users\\Usuario\\Desktop\\Programacion\\AstroSepia\\AstroSepia\\{filen.name}")
             glf = get_file_lines(file)
             filist.append(glf)
-        else:
-            pass
     elif filen.is_dir:
         scanldir = os.scandir(f"C:\\Users\\Usuario\\Desktop\\Programacion\\AstroSepia\\AstroSepia\\{filen.name}")
         for filen in scanldir:
@@ -53,8 +51,6 @@ for filen in all_files:
                             file = Path(f"C:\\Users\\Usuario\\Desktop\\Programacion\\AstroSepia\\AstroSepia\\{filen.name}")
                             glf = get_file_lines(file)
                             filist.append(glf)
-            else:
-                pass
 for i in filist:
     print(sum(i))
 
